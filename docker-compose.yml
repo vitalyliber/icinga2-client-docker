@@ -4,6 +4,8 @@ services:
     image: bebehei/icinga2-client
     restart: on-failure:5
     hostname: icinga2
+    privileged: true
+    network_mode: host
     volumes:
       - ./cache:/var/cache/icinga2
       - ./certs:/etc/apache2/ssl:ro

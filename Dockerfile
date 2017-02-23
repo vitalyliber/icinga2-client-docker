@@ -6,12 +6,18 @@ MAINTAINER Benedikt Heine
 ENV DEBIAN_FRONTEND=noninteractive \
     ICINGA2_USER_FULLNAME="Icinga2"
 
-RUN apt-get -qq update \
-     && apt-get -qqy upgrade \
-     && apt-get -qqy install --no-install-recommends \
+ADD content/ /
+
+RUN apt-key add /opt/setup/icinga2.key \
+     && apt-get -q  update \
+     && apt-get -qy upgrade \
+     && apt-get -qy install --no-install-recommends \
           ca-certificates \
           curl \
+          icinga2 \
+          icinga2-ido-mysql \
           mailutils \
+          monitoring-plugins \
           procps \
           snmp \
           ssmtp \
@@ -21,20 +27,6 @@ RUN apt-get -qq update \
           wget \
      && apt-get clean \
      && rm -rf /var/lib/apt/lists/*
-
-RUN wget --quiet -O - https://packages.icinga.org/icinga.key \
-     | apt-key add - \
-     && echo "deb http://packages.icinga.org/debian icinga-jessie main" > /etc/apt/sources.list.d/icinga2.list \
-     && apt-get -qq update \
-     && apt-get -qqy install --no-install-recommends \
-          icinga2 \
-          icinga2-ido-mysql \
-          icingacli \
-          monitoring-plugins \
-     && apt-get clean \
-     && rm -rf /var/lib/apt/lists/*
-
-ADD content/ /
 
 # Final fixes
 RUN true \

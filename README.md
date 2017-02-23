@@ -2,66 +2,19 @@
 
 This repository contains the source for the [icinga2](https://www.icinga.org/icinga2/) [docker](https://www.docker.com) image.
 
-The dockerhub-repository is located at [https://hub.docker.com/r/jordan/icinga2/](https://hub.docker.com/r/jordan/icinga2/).
+It is only the client side. When used inside a priviledged container, you'll be able to monitor the whole machine with this image
 
 This build is automated by push for the git-repo. Just crawl it via:
 
-    docker pull jordan/icinga2
+    docker pull bebehei/icinga2-client
 
 ## Image details
 
-1. Based on debian:jessie
-1. Key-Features:
-   - icinga2
-   - icingacli
-   - icingaweb2
-   - icingaweb2-director module
-   - icingaweb2-graphite module
-   - ssmtp
-   - MySQL
-   - Supervisor
-   - Apache2
-   - SSL Support
-1. No SSH. Use docker [exec](https://docs.docker.com/engine/reference/commandline/exec/) or [nsenter](https://github.com/jpetazzo/nsenter)
-1. If passwords are not supplied, they will be randomly generated and shown via stdout.
+- icinga2 client image 
 
 ## Usage
 
-Start a new container and bind to host's port 80
-
-    docker run -p 80:80 -t jordan/icinga2:latest
-
-## Icinga Web 2
-
-Icinga Web 2 can be accessed at [http://localhost/icingaweb2](http://localhost/icingaweb2) with the credentials *icingaadmin*:*icinga* (if not set differently via variables).
-
-### Saving PHP Sessions
-
-If you want to save your php-sessions over multiple boots, mount `/var/lib/php5/sessions/` into your container. Session files will get saved there.
-
-example:
-```
-docker run [...] -v $PWD/icingaweb2-sessions:/var/lib/php5/sessions/ jordan/icinga2
-```
-
-## Graphite
-
-The graphite writer can be enabled by setting the `ICINGA2_FEATURE_GRAPHITE` variable to `true` or `1` and also supplying values for `ICINGA2_FEATURE_GRAPHITE_HOST` and `ICINGA2_FEATURE_GRAPHITE_PORT`. This container does not have graphite and the carbon daemons installed so `ICINGA2_FEATURE_GRAPHITE_HOST` should not be set to `localhost`.
-
-Example:
-
-```
-docker run -t \
-  --link graphite:graphite \
-  -e ICINGA2_FEATURE_GRAPHITE=true \
-  -e ICINGA2_FEATURE_GRAPHITE_HOST=graphite \
-  -e ICINGA2_FEATURE_GRAPHITE_PORT=2003 \
-  jordan/icinga2:latest
-```
-
-## Icinga Director
-
-The [Icinga Director](https://github.com/Icinga/icingaweb2-module-director) Icinga Web 2 module is installed and enabled by default. You can disable the automatic kickstart when the container starts by setting the `DIRECTOR_KICKSTART` variable to false. To customize the kickstart settings, modify the `/etc/icingaweb2/modules/director/kickstart.ini`.
+    docker run --privileged bebehei/icinga2-client
 
 ## Sending Notification Mails
 
@@ -103,57 +56,22 @@ If this does not work, please ask your provider for the correct mail-settings or
 Also you can debug your config, by executing inside your container `ssmtp -v $address` and pressing 2x Enter.
 It will send an e-Mail to `$address` and give verbose log and all error-messages.
 
-## SSL Support
-
-For enabling of SSL support, just add a volume to `/etc/apache2/ssl`, which contains these files:
-
-- `icinga2.crt`: The certificate file for apache
-- `icinga2.key`: The corresponding private key
-- `icinga2.chain` (optional): If a certificate chain is needed, add this file. Consult your CA-vendor for additional info.
-
-For https-redirection or http/https dualstack consult `APACHE2_HTTP` env-variable.
-
-# Adding own modules
-
-To use your own modules, you're able to install these into `enabledModules`-folder of your `/etc/icingaweb2` volume.
 
 ## Environment variables Reference
 
 | Environmental Variable | Default Value | Description |
 | ---------------------- | ------------- | ----------- |
-| `ICINGA_PASSWORD` | *randomly generated* | MySQL password for icinga |
-| `ICINGAWEB2_PASSWORD` | *randomly generated* | MySQL password for icingaweb2 |
-| `DIRECTOR_PASSWORD` | *randomly generated* | MySQL password for icinga director |
-| `IDO_PASSWORD` | *randomly generated* | MySQL password for ido |
-| `DEBIAN_SYS_MAINT_PASSWORD` | *randomly generated* | Password for debian-syst-maint account |
-| `ICINGA2_FEATURE_GRAPHITE` | false | Set to true or 1 to enable graphite writer |
-| `ICINGA2_FEATURE_GRAPHITE_HOST` | graphite | hostname or IP address where Carbon/Graphite daemon is running |
-| `ICINGA2_FEATURE_GRAPHITE_PORT` | 2003 | Carbon port for graphite |
-| `ICINGA2_FEATURE_GRAPHITE_URL` | http://${ICINGA2_FEATURE_GRAPHITE_HOST} | Web-URL for Graphite |
-| `DIRECTOR_KICKSTART` | true | Set to false to disable director auto kickstart at container startup |
-| `ICINGAWEB2_ADMIN_USER` | icingaadmin | Icingaweb2 Login User<br>*After changing the username, you should also remove the old User in icingaweb2-> Configuration-> Authentication-> Users* |
-| `ICINGAWEB2_ADMIN_PASS` | icinga | Icingaweb2 Login Password |
-| `ICINGA2_USER_FULLNAME` | Icinga | Sender's display-name for notification e-Mails |
-| `APACHE2_HTTP` | `REDIRECT` | **Variable is only active, if both SSL-certificate and SSL-key are in place.** `BOTH`: Allow HTTP and https connections simulateously. `REDIRECT`: Rewrite HTTP-requests to HTTPS |
-
 ## Volume Reference
 
 All these folders are configured and able to get mounted as volume. The bottom ones are not quite neccessary.
 
 | Volume | ro/rw | Description & Usage |
 | ------ | ----- | ------------------- |
-| /etc/apache2/ssl | **ro** | Mount optional SSL-Certificates (see SSL Support) |
 | /etc/ssmtp/revaliases | **ro** | revaliases map (see Sending Notification Mails) |
 | /etc/ssmtp/ssmtp.conf | **ro** | ssmtp configufation (see Sending Notification Mails) |
 | /etc/icinga2 | rw | Icinga2 configuration folder |
-| /etc/icingaweb2 | rw | Icingaweb2 configuration folder |
-| /var/lib/mysql | rw | MySQL Database |
 | /var/lib/icinga2 | rw | Icinga2 Data |
-| /var/lib/php5/sessions/ | rw | Icingaweb2 PHP Session Files |
-| /var/log/apache2 | rw | logfolder for apache2 (not neccessary) |
 | /var/log/icinga2 | rw | logfolder for icinga2 (not neccessary) |
-| /var/log/icingaweb2 | rw | logfolder for icingaweb2 (not neccessary) |
-| /var/log/mysql | rw | logfolder for mysql (not neccessary) |
 | /var/log/supervisor | rw | logfolder for supervisord (not neccessary) |
 | /var/spool/icinga2 | rw | spool-folder for icinga2 (not neccessary) |
 | /var/cache/icinga2 | rw | cache-folder for icinga2 (not neccessary) |

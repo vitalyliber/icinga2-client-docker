@@ -19,7 +19,7 @@ chown -R nagios:nagios /var/cache/icinga2
 chown -R nagios:root /etc/icinga2
 
 # enable neccessary features
-icinga2 feature enable ido-mysql livestatus compatlog command
+icinga2 feature enable livestatus compatlog command
 
 #icinga2 API cert - regenerate new private key and certificate when running in a new container
 if [ ! -f /etc/icinga2/pki/$(hostname).key ]; then
@@ -27,35 +27,3 @@ if [ ! -f /etc/icinga2/pki/$(hostname).key ]; then
 fi
 
 chfn -f "${ICINGA2_USER_FULLNAME}" nagios
-
-# MySQL installation
-mysql <<-END
-  CREATE DATABASE IF NOT EXISTS icinga;
-  GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON icinga.* TO 'icinga'@'localhost' IDENTIFIED BY '${ICINGA_PASSWORD}';
-END
-
-mysql icinga < /usr/share/icinga2-ido-mysql/schema/mysql.sql >> /var/log/icinga2/mysql-schema.log 2>&1
-
-# IDO MySQL
-cat > /etc/icinga2/features-available/ido-mysql.conf <<-END
-/**
- * The db_ido_mysql library implements IDO functionality
- * for MySQL.
- */
-
-library "db_ido_mysql"
-
-object IdoMysqlConnection "ido-mysql" {
-  user = "icinga2-ido-mysq",
-  password = "${IDO_PASSWORD}",
-  host = "localhost",
-  database = "icinga2idomysql"
-}
-END
-
-mysql <<-END
-  CREATE DATABASE IF NOT EXISTS icinga2idomysql;
-  GRANT SELECT, INSERT, UPDATE, DELETE, DROP, CREATE VIEW, INDEX, EXECUTE ON icinga2idomysql.* TO 'icinga2-ido-mysq'@'localhost' IDENTIFIED BY '${IDO_PASSWORD}';
-END
-
-mysql icinga2idomysql < /usr/share/dbconfig-common/data/icinga2-ido-mysql/install/mysql >> /var/log/icinga2/ido-mysql-schema.log 2>&1

@@ -3,7 +3,10 @@ FROM debian:jessie
 
 MAINTAINER Benedikt Heine
 
-ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive \
+    ICINGA2_MASTER_HOST="master" \
+    ICINGA2_MASTER_FQDN=${ICINGA2_MASTER_HOST} \
+    ICINGA2_MASTER_PORT=5665
 
 ADD content/ /
 

@@ -1,5 +1,14 @@
 #!/bin/bash
 
+if [ -z "${ICINGA2_TICKET_SALT}" ]; then
+	echo ICINGA2_TICKET_SALT missing 2>&1
+	exit 1
+fi
+
+if [ -z "${ICINGA2_CLIENT_FQDN}" ]; then
+	ICINGA2_CLIENT_FQDN=$(hostname --fqdn)
+fi
+
 if [ ! "$(ls -A /etc/icinga2)" ]; then
   echo "=> Copying fresh config-files for /etc/icinga2"
   cp -R /etc/icinga2.dist/* /etc/icinga2/
@@ -19,9 +28,34 @@ chown -R nagios:nagios /var/cache/icinga2
 chown -R nagios:root /etc/icinga2
 
 # enable neccessary features
-icinga2 feature enable livestatus compatlog command
+icinga2 feature enable api livestatus compatlog command
 
-#icinga2 API cert - regenerate new private key and certificate when running in a new container
-if [ ! -f /etc/icinga2/pki/$(hostname).key ]; then
-	icinga2 node setup --master
-fi
+# the following commands are copied out of the icinga2-documentation
+icinga2 pki new-cert \
+	--cn ${ICINGA2_CLIENT_FQDN} \
+	--key /etc/icinga2/pki/${ICINGA2_CLIENT_FQDN}.key \
+	--cert /etc/icinga2/pki/${ICINGA2_CLIENT_FQDN}.crt
+
+icinga2 pki save-cert \
+	--key /etc/icinga2/pki/${ICINGA2_CLIENT_FQDN}.key \
+	--cert /etc/icinga2/pki/${ICINGA2_CLIENT_FQDN}.crt \
+	--trustedcert /etc/icinga2/pki/trusted-master.crt \
+	--host ${ICINGA2_MASTER_FQDN}
+
+icinga2 pki request \
+	--host ${ICINGA2_MASTER_FQDN} \
+	--ticket ${ICINGA2_TICKET_SALT} \
+	--key /etc/icinga2/pki/${ICINGA2_CLIENT_FQDN}.key \
+	--cert /etc/icinga2/pki/${ICINGA2_CLIENT_FQDN}.crt \
+	--trustedcert /etc/icinga2/pki/trusted-master.crt \
+	--ca /etc/icinga2/pki/ca.crt
+
+icinga2 node setup \
+	--accept-config \
+	--accept-commands \
+	--cn ${ICINGA2_CLIENT_FQDN} \
+	--zone ${ICINGA2_CLIENT_FQDN} \
+	--endpoint ${ICINGA2_MASTER_FQDN},${ICINGA2_MASTER_HOST},${ICINGA2_MASTER_PORT} \
+	--master_host ${ICINGA2_MASTER_HOST} \
+	--ticket ${ICINGA2_TICKET_SALT} \
+	--trustedcert /etc/icinga2/pki/trusted-master.crt

@@ -14,9 +14,7 @@ services:
       #- ICINGA2_MASTER_FQDN=mon
     volumes:
       - ./cache:/var/cache/icinga2
-      - ./certs:/etc/apache2/ssl:ro
-      - ./etc/icinga2:/etc/icinga2
-      - ./lib/icinga:/var/lib/icinga2
-      - ./log/icinga2:/var/log/icinga2
-      - ./log/mysql:/var/log/mysql
+      - ./etc:/etc/icinga2
+      - ./lib:/var/lib/icinga2
+      - ./log:/var/log/icinga2
       - ./spool:/var/spool/icinga2

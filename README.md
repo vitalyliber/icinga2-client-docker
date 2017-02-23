@@ -18,8 +18,13 @@ This build is automated by push for the git-repo. Just crawl it via:
 
 ## Environment variables Reference
 
-| Environmental Variable | Default Value | Description |
-| ---------------------- | ------------- | ----------- |
+| Environmental Variable | Default Value          | Description |
+| ---------------------- | ---------------------- | ----------- |
+| `ICINGA2_TICKET_SALT`  | *undefined*            | **required:** Container will stop without ticket-salt to process certificate request. |
+| `ICINGA2_MASTER_HOST`  | mon                    | The hostname of icinga2
+| `ICINGA2_MASTER_FQDN`  | *$ICINGA2_MASTER_HOST* | If your icinga2 master certs' FQDN does not match the hostname, define this in addition. If you set `ICINGA2_MASTER_HOST` correctly, you should not worry about this. |
+| `ICINGA2_MASTER_PORT`  | 5665                   | Default port on the icinga2 master. |
+| `ICINGA2_CLIENT_FQDN`  | *$(hostname --fqdn)*   | To request a certificate from your master, your requesting FQDN has to match the FQDN chained to your given ticket salt. If your hostname does not match the FQDN, defined this variable and set the value to the corresponding value of the master. |
 ## Volume Reference
 
 All these folders are configured and able to get mounted as volume. The bottom ones are not quite neccessary.

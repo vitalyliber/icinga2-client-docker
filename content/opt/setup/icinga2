@@ -5,9 +5,11 @@ if [ -z "${ICINGA2_TICKET_SALT}" ]; then
 	exit 1
 fi
 
-if [ -z "${ICINGA2_CLIENT_FQDN}" ]; then
-	ICINGA2_CLIENT_FQDN=$(hostname --fqdn)
-fi
+ICINGA2_MASTER_HOST=${ICINGA2_MASTER_HOST:-mon}
+ICINGA2_MASTER_FQDN=${ICINGA2_MASTER_FQDN:-$ICINGA2_MASTER_HOST}
+ICINGA2_MASTER_PORT=${ICINGA2_MASTER_PORT:-5665}
+
+ICINGA2_CLIENT_FQDN=${ICINGA2_CLIENT_FQDN:-$(hostname --fqdn)}
 
 if [ ! "$(ls -A /etc/icinga2)" ]; then
   echo "=> Copying fresh config-files for /etc/icinga2"

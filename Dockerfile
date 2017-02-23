@@ -11,19 +11,11 @@ RUN apt-key add /opt/setup/icinga2.key \
      && apt-get -q  update \
      && apt-get -qy upgrade \
      && apt-get -qy install --no-install-recommends \
-          ca-certificates \
-          curl \
           icinga2 \
-          icinga2-ido-mysql \
-          mailutils \
           monitoring-plugins \
           procps \
           snmp \
-          ssmtp \
           sudo \
-          supervisor \
-          unzip \
-          wget \
      && apt-get clean \
      && rm -rf /var/lib/apt/lists/*
 
@@ -38,5 +30,4 @@ RUN true \
 
 EXPOSE 80 443 5665
 
-# Initialize and run Supervisor
 ENTRYPOINT ["/opt/run"]

@@ -25,5 +25,3 @@ icinga2 feature enable livestatus compatlog command
 if [ ! -f /etc/icinga2/pki/$(hostname).key ]; then
 	icinga2 node setup --master
 fi
-
-chfn -f "${ICINGA2_USER_FULLNAME}" nagios

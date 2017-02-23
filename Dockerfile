@@ -3,8 +3,7 @@ FROM debian:jessie
 
 MAINTAINER Benedikt Heine
 
-ENV DEBIAN_FRONTEND=noninteractive \
-    ICINGA2_USER_FULLNAME="Icinga2"
+ENV DEBIAN_FRONTEND=noninteractive
 
 ADD content/ /
 

@@ -1,0 +1,11 @@
+# Never show the lecture on first use
+# For some reasons sudo does not save a
+# lecture-status in docker containers
+Defaults lecture = never
+
+# Some sudo-programs
+nagios ALL=(root)NOPASSWD:/usr/sbin/smartctl
+nagios ALL=(root)NOPASSWD:/usr/lib/nagios/plugins/check_dhcp
+nagios ALL=(root)NOPASSWD:/usr/lib/nagios/plugins/check_disk
+nagios ALL=(root)NOPASSWD:/sbin/dmsetup status --noflush
+nagios ALL=(root)NOPASSWD:/sbin/dmsetup status

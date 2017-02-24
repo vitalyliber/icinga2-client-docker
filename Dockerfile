@@ -11,10 +11,14 @@ RUN apt-key add /opt/setup/icinga2.key \
      && apt-get -q  update \
      && apt-get -qy upgrade \
      && apt-get -qy install --no-install-recommends \
+          ethtool \
           icinga2 \
           monitoring-plugins \
+          net-tools \
           procps \
+          smartmontools \
           snmp \
+          sysstat \
           sudo \
      && apt-get clean \
      && rm -rf /var/lib/apt/lists/*

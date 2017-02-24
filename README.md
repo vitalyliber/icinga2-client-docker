@@ -2,19 +2,33 @@
 
 This repository contains the source for the [icinga2](https://www.icinga.org/icinga2/) [docker](https://www.docker.com) image.
 
-It is only the client side. When used inside a priviledged container, you'll be able to monitor the whole machine with this image
+It is only the **client side**. When used inside a priviledged container, you'll be able to monitor the whole machine with this image.
 
-This build is automated by push for the git-repo. Just crawl it via:
+For the **master node** consult [@jjethwa's docker image](https://github.com/jjethwa/icinga2/).
 
-    docker pull bebehei/icinga2-client
+# Why the fuck would I need an icinga2-client-node in a docker-container?
 
-## Image details
+Well, actually. That's a good question. But let me answer it with a question: Have you ever used synology-products and their shell?
 
-- icinga2 client image 
+- **No:** You had been lucky.
+- **Yes:** You know the evidence.
+
+Well, to paraphrase it:
+
+- It's impossible to build icinga2 on a Synology NAS with 1G of RAM. It may be. But if so, it's at least a PITA.
+- I disliked the monitoring of my NAS via the SNMP plugin, as the service had been flapping constantly, because Synology reported every time, when it had not been connected to the update site. Which results in a flapping service. This is just impractical.
+- Hacking a docker client-image was straight forward, as I contributed much things to @jjethwa's image.
+  - **Now my Synology Box just feels like another good Linux-Box.** And I can produce for every HDD/FS/RAID/... a single icinga2-service.
+  - docker is squeezable.
 
 ## Usage
 
-    docker run --privileged bebehei/icinga2-client
+Recommended execution is via `docker-compose`. There is too much stuff which has to be configured outside the container to run it via plain `docker run` but of course, it would be possible.
+
+    wget https://raw.githubusercontent.com/bebehei/icinga2-client-docker/master/docker-compose.yml
+    #add your ticket-salt information
+    $EDITOR docker-compose.yml
+    docker-compose up
 
 ## Environment variables Reference
 

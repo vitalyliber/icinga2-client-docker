@@ -21,6 +21,8 @@ RUN apt-key add /opt/setup/icinga2.key \
           sysstat \
           sudo \
           wget \
+	  ca-certificates \
+	  nagios-plugins-contrib \
      && apt-get clean \
      && rm -rf /var/lib/apt/lists/*
 
@@ -35,8 +37,8 @@ RUN true \
 
 # Install RAM memory checker
 RUN true \
-    && cd /usr/lib/nagios/plugins/
-    && wget https://raw.githubusercontent.com/justintime/nagios-plugins/master/check_mem/check_mem.pl
+    && cd /usr/lib/nagios/plugins/ \
+    && wget --no-check-certificate https://raw.githubusercontent.com/justintime/nagios-plugins/master/check_mem/check_mem.pl \
     && chmod 0755 check_mem.pl
 
 EXPOSE 80 443 5665

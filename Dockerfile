@@ -20,6 +20,7 @@ RUN apt-key add /opt/setup/icinga2.key \
           snmp \
           sysstat \
           sudo \
+          wget \
      && apt-get clean \
      && rm -rf /var/lib/apt/lists/*
 
@@ -31,6 +32,12 @@ RUN true \
         /bin/ping \
         /bin/ping6 \
         /usr/lib/nagios/plugins/check_icmp
+
+# Install RAM memory checker
+RUN true \
+    && cd /usr/lib/nagios/plugins/
+    && wget https://raw.githubusercontent.com/justintime/nagios-plugins/master/check_mem/check_mem.pl
+    && chmod 0755 check_mem.pl
 
 EXPOSE 80 443 5665
 

@@ -22,6 +22,7 @@ RUN apt-key add /opt/setup/icinga2.key \
           sudo \
           wget \
 	  ca-certificates \
+     && apt-get install -qy libnagios-plugin-perl \
 	  nagios-plugins-contrib \
      && apt-get clean \
      && rm -rf /var/lib/apt/lists/*

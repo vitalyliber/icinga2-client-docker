@@ -6,7 +6,7 @@ if [ -f /opt/custom_run ]; then
     /opt/custom_run
 fi
 
-/opt/setup/icinga2
+/opt/setup/icinga2_proposed_by_director
 
 service icinga2 start
 

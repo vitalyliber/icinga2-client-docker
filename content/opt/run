@@ -1,10 +1,12 @@
 #!/bin/bash
 
-if [ -f /opt/custom_run ]; then
-    chmod u+x /opt/custom_run
-    echo "=>executing /opt/custom_run"
-    /opt/custom_run
-fi
+source /etc/profile.d/rvm.sh \
+    && rvm install 2.4.1 \
+    && rvm --default use 2.4.1
+
+gem install --no-ri --no-rdoc nagios-plugin
+gem install --no-ri --no-rdoc sidekiq
+rvm current
 
 /opt/setup/icinga2_proposed_by_director
 

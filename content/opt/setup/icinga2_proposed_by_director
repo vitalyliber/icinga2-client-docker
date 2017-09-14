@@ -57,7 +57,7 @@ if ! [ -d $ICINGA2_SSL_DIR ]; then mkdir $ICINGA2_SSL_DIR; fi
 chown $ICINGA2_USER $ICINGA2_SSL_DIR
 
 if [ -f  "${ICINGA2_SSL_DIR}/${ICINGA2_CLIENT_FQDN}.crt" ]; then
-  warn "ERROR: a certificate for '${ICINGA2_CLIENT_FQDN}' already exists"
+  warn "a certificate for '${ICINGA2_CLIENT_FQDN}' already exists"
   warn "Please remove ${ICINGA2_SSL_DIR}/${ICINGA2_CLIENT_FQDN}.??? in case you want a"
   warn "new certificate to be generated and signed by ${ICINGA2_CA_NODE}"
   exit 1

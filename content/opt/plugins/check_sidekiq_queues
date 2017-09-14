@@ -1,0 +1,60 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'nagios-plugin'
+require 'sidekiq/api'
+# install dependences
+# gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+# \curl -sSL https://get.rvm.io | bash -s stable
+# source /etc/profile.d/rvm.sh
+# rvm install 2.4.1
+# rvm --default use 2.4.1
+# gem install 'nagios-plugin'
+# gem install 'sidekiq'
+# run checker
+# cat check_sidekiq_queues.sh
+#!/bin/bash
+# source /etc/profile.d/rvm.sh
+# /usr/lib/nagios/plugins/check_sidekiq_queues $1 "$2"
+#
+# ./check_sidekiq_queues.sh -q 'nessosphere nessosphere_my_energy nessosphere_my_events'
+class CheckSidekiqQueues < Nagios::Plugin
+  # What should run when check is run
+  def run
+    # Get more options via arguments using the OptParse object.
+    # -w and -c for warning and critical thresholds are already included
+    @opts.on('-q', '--queues QUEUES', 'Sidkeiq queues') do |q|
+      @sidekiq_queues = q
+    end
+    # Init the argument parser
+    parse_argv
+    # Begin the check
+    begin
+      queues_for_removing = []
+      @sidekiq_queues = @sidekiq_queues.split(' ')
+      # Run the commands you actually need for your check
+      processes = Sidekiq::ProcessSet.new
+      queues = processes.map {|p| p['queues']} # dev: [['q'], ['q']], prod: [['q, q']]
+      queues.each do |q|
+        @sidekiq_queues.each do |sq|
+          result = q.include? sq
+          queues_for_removing << sq if result  
+        end
+      end
+      queues_for_removing.each do |q|
+        @sidekiq_queues.delete(q)
+      end
+      # Check the values against the thresholds
+      if not @sidekiq_queues.empty?
+        critical("Queues is not found: #{@sidekiq_queues.join(', ')}")
+      else
+        ok("Yay!")
+      end
+    # When the code has failed
+    rescue => e
+      critical("Failed!: #{e}")
+    end
+  end
+end
+# Initialize and run the check!
+@my_nagios_check = CheckSidekiqQueues.new(:shortname => 'check_sidekiq_queues')
+@my_nagios_check.run

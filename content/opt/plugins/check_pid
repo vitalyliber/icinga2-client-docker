@@ -1,0 +1,60 @@
+#!/bin/bash
+
+ST_OK=0
+ST_CR=2
+PROC=/proc
+PROC_HOST=/home/host/proc
+
+function print_help {
+    echo ""
+    echo "Nagios plugin to check a specific process via ps is running"
+    echo ""
+    echo "Options:"
+    echo "  --process)"
+    echo "     You need to provide a string containing the exact process"
+    echo "  --file)"
+    echo "     Name PID file containing the PID of the process to check"
+}
+
+case "$1" in
+        --help)
+            print_help
+            ;;
+        --process)
+            pidfileval=$2
+            shift
+            ;;
+        --file)
+      			if [ -f $2 ]
+        			then
+            		pidfileval=$(cat $2)
+            else
+            	echo "Process: $3 not running"
+		exit $ST_CR
+            fi
+            ;;
+        *)
+            echo "Unknown argument: $1"
+            print_help
+	    exit 1
+            ;;
+        esac
+
+
+function get_vals {
+	if [ -e $PROC/${pidfileval} -a $PROC/${pidfileval}/exe ]; then
+		output="Process: $3 running"
+		echo $output
+		exit $ST_OK
+	elif [ -e $PROC_HOST/${pidfileval} -a $PROC_HOST/${pidfileval}/exe ]; then
+		output="Process: $3 running"
+		echo $output
+		exit $ST_OK
+	else
+		output="Process: $3 not running"
+		echo $output
+		exit $ST_CR
+	fi
+}
+
+get_vals

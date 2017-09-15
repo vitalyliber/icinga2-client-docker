@@ -1,20 +1,12 @@
 version: '2'
 services:
   icinga2:
-    image: bebehei/icinga2-client
+    build: .
+    image: registry.sibext.com:5000/sibext/icinga2-client-prod:1.0
     restart: on-failure:5
     hostname: icinga2
     privileged: true
-    network_mode: host
     environment:
-      # Fill it with the output of icinga2 pki ticket --cn <hostname> on your master
-      - ICINGA2_TICKET_SALT=
-      - ICINGA2_MASTER_HOST=mon
-      # if your master's fqdn does not match the hostname define the name additionally
-      #- ICINGA2_MASTER_FQDN=mon
-    volumes:
-      - ./cache:/var/cache/icinga2
-      - ./etc:/etc/icinga2
-      - ./lib:/var/lib/icinga2
-      - ./log:/var/log/icinga2
-      - ./spool:/var/spool/icinga2
+      - ICINGA2_TICKET_SALT=558c9ab8a5328061965e121167a9481ad9511a21
+      - ICINGA2_MASTER_HOST=mon.sibext.com
+      - ICINGA2_CLIENT_FQDN=cloud.nessosphere.com

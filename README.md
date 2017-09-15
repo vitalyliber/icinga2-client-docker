@@ -51,3 +51,10 @@ All these folders are configured and able to get mounted as volume. The bottom o
 | /var/log/supervisor | rw | logfolder for supervisord (not neccessary) |
 | /var/spool/icinga2 | rw | spool-folder for icinga2 (not neccessary) |
 | /var/cache/icinga2 | rw | cache-folder for icinga2 (not neccessary) |
+
+## How to build new image
+
+```docker
+docker-compose build icinga2
+docker-compose push icinga2
+```

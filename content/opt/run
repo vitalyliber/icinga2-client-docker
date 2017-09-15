@@ -1,13 +1,5 @@
 #!/bin/bash
 
-source /etc/profile.d/rvm.sh \
-    && rvm install 2.4.1 \
-    && rvm --default use 2.4.1
-
-gem install --no-ri --no-rdoc nagios-plugin
-gem install --no-ri --no-rdoc sidekiq
-rvm current
-
 /opt/setup/icinga2_proposed_by_director
 
 service icinga2 start

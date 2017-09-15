@@ -1,11 +1,11 @@
 # Dockerfile for icinga2 as monitored client
-FROM debian:jessie
+FROM ruby:2.4.1
 
 MAINTAINER Benedikt Heine
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-ADD content/ /
+ADD content/opt/setup/ /opt/setup/
 
 RUN apt-key add /opt/setup/icinga2.key \
      && apt-get -q  update \
@@ -29,6 +29,8 @@ RUN apt-key add /opt/setup/icinga2.key \
 	  nagios-plugins-contrib \
      && apt-get clean \
      && rm -rf /var/lib/apt/lists/*
+
+ADD content/ /
 
 # Install RAM memory checker
 RUN true \
@@ -57,16 +59,24 @@ RUN true \
 
 # Install Sidekiq queues checker (Ruby)
 RUN true \
-    gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 \
-    && \curl -sSL https://get.rvm.io | bash -s stable \
     && cp /opt/plugins/check_sidekiq_queues /usr/lib/nagios/plugins/check_sidekiq_queues \
     && cp /opt/plugins/check_sidekiq_queues.sh /usr/lib/nagios/plugins/check_sidekiq_queues.sh \
     && chmod 0755 /usr/lib/nagios/plugins/check_sidekiq_queues \
     && chmod 0755 /usr/lib/nagios/plugins/check_sidekiq_queues.sh
 
+# Install Sidekiq queues checker2 (Ruby)
+RUN true \
+    && cp /opt/plugins/check_sidekiq_queues2 /usr/lib/nagios/plugins/check_sidekiq_queues2 \
+    && cp /opt/plugins/check_sidekiq_queues2.sh /usr/lib/nagios/plugins/check_sidekiq_queues2.sh \
+    && chmod 0755 /usr/lib/nagios/plugins/check_sidekiq_queues2 \
+    && chmod 0755 /usr/lib/nagios/plugins/check_sidekiq_queues2.sh
+
 # Install Elasticsearch checker
 RUN wget --no-check-certificate https://raw.githubusercontent.com/orthecreedence/check_elasticsearch/master/check_elasticsearch --directory-prefix="/usr/lib/nagios/plugins/" \
     && chmod 0755 /usr/lib/nagios/plugins/check_elasticsearch
+
+# Install Gems
+RUN gem install --no-ri --no-rdoc nagios-plugin sidekiq
 
 EXPOSE 5665
 
